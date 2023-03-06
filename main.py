@@ -1,7 +1,7 @@
 from PIL import Image
 import os
 
-TARGET_PATH = "/home/gasparov/DEV/python/compress_images/images_test"
+TARGET_PATH = ""
 
 def get_filepath(path):
     return os.path.join(os.getcwd(), path)
