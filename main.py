@@ -40,6 +40,7 @@ def compress(root,path,filename):
         os.remove(filepath)
     except:
         print("Hata")
+        #hatalı image error folder'ına atılacak
         logging.error(path)
 
     return
