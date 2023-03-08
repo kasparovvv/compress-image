@@ -1,3 +1,4 @@
 original_images
 images_clone
-errors*.
+errors
+**/__pycache__
