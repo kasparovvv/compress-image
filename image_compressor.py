@@ -66,9 +66,9 @@ class ImageCompressor:
         new_path = root+"/"+new_file_name+extension
 
         try:
-            optimize = False
-            if extension.__eq__("png"):
-                optimize = True
+            # optimize = False
+            # if extension.__eq__("png"):
+            #     optimize = True
 
             image.save(new_path, optimize=True, quality=self.quality)
             #os.remove(filepath)
