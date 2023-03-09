@@ -15,7 +15,8 @@ class ImageCompressor:
     success_count: int = 0
     error_count: int = 0
     quality: int = 30
-    formats = ('.png', '.jpeg', '.jpg')
+    formats = ('.png', '.jpeg', '.jpg','.pdf')
+    new_path:str = ""
 
     def get_filepath(self, path) -> str:
         return os.path.join(os.getcwd(), path)
@@ -24,17 +25,18 @@ class ImageCompressor:
         return pathlib.Path(filename).suffix
 
     def create_file_name(self) -> str:
-        return "errors_"+str(time.strftime("%Y%m%d-%H%M%S"))
+        return "images_"+str(time.strftime("%Y%m%d"))
 
-    def crete_error_files(self) -> None:
-        # log file için belki silinecek
-        logging.basicConfig(
-            filename="compress-image/errors.log", level=logging.ERROR)
+    def crete_files(self) -> None:
 
+        self.new_path = os.path.join(
+            "compress-image/tries",  self.create_file_name())
+        if os.path.exists( self.new_path):
+            shutil.rmtree( self.new_path)
+            print("Dosya zaten var olduğu için siliniyor..")
+       
         mode = 0o666
-        error_path = os.path.join(
-            "compress-image/errors",  self.create_file_name())
-        os.mkdir(error_path, mode)
+        os.mkdir( self.new_path, mode)
 
     def file_operations(self) -> None:
         if os.path.exists(self.target_dir):
@@ -46,13 +48,18 @@ class ImageCompressor:
         shutil.copytree(self.src_dir, self.target_dir)
         print("Dosyalar test klasörüne kopyalandı")
 
-    def get_file_extension(self, filename) -> str:
+    def get_file_extension(self, filename):
 
         extensions = [".jpeg", ".jpg", ".png", ".JPEG", ".PNG", ".JPG"]
         extension = pathlib.Path(filename).suffix
 
         str_match = [s for s in extensions if extension in s]
         return str_match[0]
+    
+    def get_folder_name_from_root(self,root):
+        folder = root.split('\\')
+        return folder[2]
+
 
     def compress(self, root, path, filename) -> None:
 
@@ -63,32 +70,40 @@ class ImageCompressor:
 
         extension = str(self.get_file_extension(filename))
 
-        new_path = root+"/"+new_file_name+extension
+        folder = self.get_folder_name_from_root(root)
+        new_path = self.new_path+"/"+folder+"/"+new_file_name+extension
+        new_path = os.path.normpath(new_path)
 
+     
+        #print(new_path)
+       
         try:
             optimize = False
             if extension.__eq__("png"):
                 optimize = True
 
-            image.save(new_path, optimize=True, quality=self.quality)
-            #os.remove(filepath)
 
+            if os.path.exists(self.new_path+"/"+folder):
+                image.save(new_path, optimize=optimize, quality=self.quality)
+            else:
+                mode = 0o666
+                os.mkdir( self.new_path+"/"+folder, mode)
+
+            
             print(Fore.GREEN + path + " =>  işlendi")
 
             self.success_count += 1
         except Exception as e:
-            print(Fore.RED+new_path)
+            print(e)
             # hatalı image error folder'ına atılacak
             self.error_count += 1
-            logging.error(e)
+            logging.error(path)
 
         return
 
     def start(self) -> None:
 
-        self.crete_error_files()
-        self.file_operations()
-
+        self.crete_files()
         print("İşlem başlatılıyor...")
 
         time.sleep(1)
@@ -98,8 +113,6 @@ class ImageCompressor:
         for (root, dirs, file) in os.walk(self.target_dir):
             for f in file:
                 if os.path.splitext(f)[1].lower() in self.formats:
-                    # if ('.png' in f) or ('.jpeg' in f) :
-                    # print(root,dirs,f)
                     path = root + '/' + f
                     self.compress(root, path, f)
 
