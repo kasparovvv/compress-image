@@ -3,7 +3,6 @@ from image_compressor import ImageCompressor
 def main():
 
     image_compressor = ImageCompressor(TARGET_PATH,SRC_DIR)
-    #image_compressor.file_operations()
     image_compressor.start()
 
 

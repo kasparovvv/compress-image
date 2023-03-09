@@ -1,5 +1,6 @@
 original_images
 images_clone
+/image_compressor_2.py
 errors
+errors.log
 **/__pycache__
-image_compressor_2
